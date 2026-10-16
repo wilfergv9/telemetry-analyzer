@@ -1,0 +1,16 @@
+# Compilación
+build/
+bin/
+lib/
+
+# IDEs y editores
+.vscode/
+.idea/
+*.swp
+*~
+
+# Artefactos CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
