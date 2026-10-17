@@ -14,6 +14,7 @@ add_executable(telemetry_engine
     src/main.cpp
     src/core/CPUMonitor.cpp
     src/core/MemoryMonitor.cpp
+    src/core/TelemetryEngine.cpp
 )
 
 # Directorio de cabeceras públicas/internas

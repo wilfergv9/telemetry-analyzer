@@ -1,22 +1,30 @@
-#include "core/CPUMonitor.hpp"
-#include "core/MemoryMonitor.hpp"
-#include <chrono>
+#include "core/TelemetryEngine.hpp"
 #include <iomanip>
 #include <iostream>
-#include <thread>
 
 int main() {
-    CPUMonitor cpu;
-    MemoryMonitor memory;
+    TelemetryEngine engine(std::chrono::milliseconds(250)); // sample every 250ms
 
-    if (!cpu.initialize()) {
-        std::cerr << "[Error] Failed to initialize CPUMonitor." << std::endl;
+    if (!engine.initialize()) {
+        std::cerr << "[Error] Initialization failed." << std::endl;
         return 1;
     }
 
-    std::cout << "[TelemetryAnalyzer] Sampling system metrics...\n" << std::endl;
+    std::cout << "[Main] Starting telemetry engine in background..." << std::endl;
+    engine.start();
+
+    // Simulate game/workload execution on main thread
+    std::cout << "[Main] Workload running for 3 seconds..." << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    std::cout << "[Main] Stopping engine..." << std::endl;
+    engine.stop();
+
+    auto samples = engine.getSamples();
+    std::cout << "[Main] Capture finished. Total samples collected: " << samples.size() << "\n" << std::endl;
+
     std::cout << std::left 
-              << std::setw(8)  << "Sample"
+              << std::setw(8)  << "Index"
               << std::setw(14) << "CPU (%)"
               << std::setw(14) << "CPU Temp"
               << std::setw(16) << "RAM Used (MB)"
@@ -24,37 +32,14 @@ int main() {
               << std::endl;
     std::cout << std::string(64, '-') << std::endl;
 
-    for (int i = 0; i < 5; ++i) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
-        auto cpuUsage = cpu.getCpuUsagePercentage();
-        auto cpuTemp = cpu.getPackageTemperature();
-        auto memMetrics = memory.getMetrics();
-
-        std::cout << std::left << std::setw(8) << (i + 1);
-
-        if (cpuUsage) {
-            std::cout << std::fixed << std::setprecision(1) << std::setw(14) << *cpuUsage;
-        } else {
-            std::cout << std::setw(14) << "N/A";
-        }
-
-        if (cpuTemp) {
-            std::cout << std::fixed << std::setprecision(1) << std::setw(14) 
-                      << (std::to_string(static_cast<int>(*cpuTemp)) + " °C");
-        } else {
-            std::cout << std::setw(14) << "N/A";
-        }
-
-        if (memMetrics) {
-            double usedMb = static_cast<double>(memMetrics->usedRamKb) / 1024.0;
-            std::cout << std::fixed << std::setprecision(0) << std::setw(16) << usedMb
-                      << std::fixed << std::setprecision(1) << std::setw(12) << memMetrics->ramUsagePercentage;
-        } else {
-            std::cout << std::setw(16) << "N/A" << std::setw(12) << "N/A";
-        }
-
-        std::cout << std::endl;
+    for (size_t i = 0; i < samples.size(); ++i) {
+        const auto& s = samples[i];
+        std::cout << std::left << std::setw(8) << (i + 1)
+                  << std::fixed << std::setprecision(1) << std::setw(14) << s.cpuUsagePercentage
+                  << std::fixed << std::setprecision(1) << std::setw(14) << (std::to_string(static_cast<int>(s.cpuTemperatureCelsius)) + " °C")
+                  << std::fixed << std::setprecision(0) << std::setw(16) << s.ramUsageMb
+                  << std::fixed << std::setprecision(1) << std::setw(12) << s.ramUsagePercentage
+                  << std::endl;
     }
 
     return 0;
