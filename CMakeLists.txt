@@ -13,6 +13,7 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 add_executable(telemetry_engine
     src/main.cpp
     src/core/CPUMonitor.cpp
+    src/core/MemoryMonitor.cpp
 )
 
 # Directorio de cabeceras públicas/internas
