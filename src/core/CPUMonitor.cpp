@@ -1,5 +1,6 @@
 #include "core/CPUMonitor.hpp"
 #include <fstream>
+#include <sstream>
 
 namespace fs = std::filesystem;
 
@@ -14,6 +15,10 @@ bool CPUMonitor::initialize() {
 
     tempInputPath_ = *pathOpt;
     isInitialized_ = true;
+
+    // Primer snapshot para tener punto de referencia inicial
+    previousSnapshot_ = readCpuTimeSnapshot();
+
     return true;
 }
 
@@ -33,7 +38,6 @@ std::optional<fs::path> CPUMonitor::findCoretempPath() {
             std::ifstream file(nameFile);
             std::string sensorName;
             if (file >> sensorName && sensorName == "coretemp") {
-                // temp1_input typically maps to Package id 0
                 fs::path inputPath = entry.path() / "temp1_input";
                 if (fs::exists(inputPath)) {
                     return inputPath;
@@ -60,6 +64,57 @@ std::optional<double> CPUMonitor::getPackageTemperature() {
         return std::nullopt;
     }
 
-    // Kernel values are in millidegrees Celsius (e.g., 35000 -> 35.0 C)
     return static_cast<double>(rawValue) / 1000.0;
+}
+
+std::optional<CPUMonitor::CpuTimeSnapshot> CPUMonitor::readCpuTimeSnapshot() {
+    std::ifstream file("/proc/stat");
+    if (!file.is_open()) {
+        return std::nullopt;
+    }
+
+    std::string line;
+    if (!std::getline(file, line)) {
+        return std::nullopt;
+    }
+
+    std::istringstream ss(line);
+    std::string cpuLabel;
+    ss >> cpuLabel;
+
+    if (cpuLabel != "cpu") {
+        return std::nullopt;
+    }
+
+    uint64_t user = 0, nice = 0, system = 0, idle = 0, iowait = 0;
+    uint64_t irq = 0, softirq = 0, steal = 0;
+
+    if (!(ss >> user >> nice >> system >> idle >> iowait >> irq >> softirq >> steal)) {
+        return std::nullopt;
+    }
+
+    uint64_t activeTime = user + nice + system + irq + softirq + steal;
+    uint64_t idleTime = idle + iowait;
+    uint64_t totalTime = activeTime + idleTime;
+
+    return CpuTimeSnapshot{activeTime, totalTime};
+}
+
+std::optional<double> CPUMonitor::getCpuUsagePercentage() {
+    auto currentSnapshot = readCpuTimeSnapshot();
+    if (!currentSnapshot || !previousSnapshot_) {
+        previousSnapshot_ = currentSnapshot;
+        return std::nullopt;
+    }
+
+    uint64_t deltaActive = currentSnapshot->activeTime - previousSnapshot_->activeTime;
+    uint64_t deltaTotal = currentSnapshot->totalTime - previousSnapshot_->totalTime;
+
+    previousSnapshot_ = currentSnapshot;
+
+    if (deltaTotal == 0) {
+        return 0.0;
+    }
+
+    return (static_cast<double>(deltaActive) / static_cast<double>(deltaTotal)) * 100.0;
 }

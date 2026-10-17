@@ -1,5 +1,6 @@
 #include "core/CPUMonitor.hpp"
 #include <chrono>
+#include <iomanip>
 #include <iostream>
 #include <thread>
 
@@ -7,19 +8,37 @@ int main() {
     CPUMonitor cpu;
 
     if (!cpu.initialize()) {
-        std::cerr << "[Error] Failed to find 'coretemp' sensor in /sys/class/hwmon/" << std::endl;
+        std::cerr << "[Error] Failed to initialize CPUMonitor." << std::endl;
         return 1;
     }
 
-    std::cout << "[TelemetryAnalyzer] Sensor located. Sampling package temperature..." << std::endl;
+    std::cout << "[TelemetryAnalyzer] Sampling CPU metrics (5 iterations)...\n" << std::endl;
+    std::cout << std::left << std::setw(10) << "Sample" 
+              << std::setw(16) << "CPU Usage (%)" 
+              << std::setw(16) << "Temperature" << std::endl;
+    std::cout << std::string(42, '-') << std::endl;
 
     for (int i = 0; i < 5; ++i) {
-        if (auto temp = cpu.getPackageTemperature()) {
-            std::cout << "Sample " << i + 1 << ": " << *temp << " °C" << std::endl;
-        } else {
-            std::cerr << "Failed to read sample " << i + 1 << std::endl;
-        }
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        auto usage = cpu.getCpuUsagePercentage();
+        auto temp = cpu.getPackageTemperature();
+
+        std::cout << std::left << std::setw(10) << (i + 1);
+
+        if (usage) {
+            std::cout << std::fixed << std::setprecision(1) << std::setw(16) << *usage;
+        } else {
+            std::cout << std::setw(16) << "N/A";
+        }
+
+        if (temp) {
+            std::cout << std::fixed << std::setprecision(1) << *temp << " °C";
+        } else {
+            std::cout << "N/A";
+        }
+
+        std::cout << std::endl;
     }
 
     return 0;
