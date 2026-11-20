@@ -15,9 +15,8 @@ bool CPUMonitor::initialize() {
         isInitialized_ = false;   // no sensor: keep running without temperature
     }
 
-    // CPU usage does not depend on the temperature sensor
-    previousSnapshot_ = readCpuTimeSnapshot();
-    return previousSnapshot_.has_value();
+    previousSnapshot_.reset();
+    return true;
 }
 
 std::optional<fs::path> CPUMonitor::findCoretempPath() {

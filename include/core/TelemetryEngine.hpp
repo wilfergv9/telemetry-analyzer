@@ -11,10 +11,10 @@
 
 struct TelemetrySample {
     std::chrono::system_clock::time_point timestamp;
-    double cpuUsagePercentage{0.0};
-    std::optional<double> cpuTemperatureCelsius{0.0};
-    double ramUsageMb{0.0};
-    double ramUsagePercentage{0.0};
+    std::optional<double> cpuUsagePercentage;
+    std::optional<double> cpuTemperatureCelsius;
+    std::optional<double> ramUsageMb;
+    std::optional<double> ramUsagePercentage;
 };
 
 class TelemetryEngine {

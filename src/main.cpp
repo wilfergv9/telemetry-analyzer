@@ -46,10 +46,10 @@ int main() {
     for (size_t i = 0; i < samples.size(); ++i) {
         const auto& s = samples[i];
         std::cout << std::left << std::setw(8) << (i + 1)
-                  << std::fixed << std::setprecision(1) << std::setw(14) << s.cpuUsagePercentage
-                  << std::fixed << std::setprecision(1) << std::setw(14) << formatOptional(s.cpuTemperatureCelsius, 1, " °C")
-                  << std::fixed << std::setprecision(0) << std::setw(16) << s.ramUsageMb
-                  << std::fixed << std::setprecision(1) << std::setw(12) << s.ramUsagePercentage
+                  << std::setw(14) << formatOptional(s.cpuUsagePercentage, 1, "")
+                  << std::setw(14) << formatOptional(s.cpuTemperatureCelsius, 1, " °C")
+                  << std::setw(16) << formatOptional(s.ramUsageMb, 0, "")
+                  << std::setw(12) << formatOptional(s.ramUsagePercentage, 1, "")
                   << std::endl;
     }
 
