@@ -8,18 +8,16 @@ CPUMonitor::CPUMonitor() = default;
 
 bool CPUMonitor::initialize() {
     auto pathOpt = findCoretempPath();
-    if (!pathOpt) {
-        isInitialized_ = false;
-        return false;
+    if (pathOpt) {
+        tempInputPath_ = *pathOpt;
+        isInitialized_ = true;    // temperature sensor found
+    } else {
+        isInitialized_ = false;   // no sensor: keep running without temperature
     }
 
-    tempInputPath_ = *pathOpt;
-    isInitialized_ = true;
-
-    // Primer snapshot para tener punto de referencia inicial
+    // CPU usage does not depend on the temperature sensor
     previousSnapshot_ = readCpuTimeSnapshot();
-
-    return true;
+    return previousSnapshot_.has_value();
 }
 
 std::optional<fs::path> CPUMonitor::findCoretempPath() {
