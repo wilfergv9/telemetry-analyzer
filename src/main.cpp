@@ -1,6 +1,17 @@
 #include "core/TelemetryEngine.hpp"
 #include <iomanip>
 #include <iostream>
+#include <optional>
+#include <sstream>
+#include <string>
+
+std::string formatOptional(const std::optional<double>& value,
+                           int decimals, const std::string& unit) {
+    if (!value) return "N/D";
+    std::ostringstream out;
+    out << std::fixed << std::setprecision(decimals) << *value << unit;
+    return out.str();
+}
 
 int main() {
     TelemetryEngine engine(std::chrono::milliseconds(250)); // sample every 250ms
@@ -36,7 +47,7 @@ int main() {
         const auto& s = samples[i];
         std::cout << std::left << std::setw(8) << (i + 1)
                   << std::fixed << std::setprecision(1) << std::setw(14) << s.cpuUsagePercentage
-                  << std::fixed << std::setprecision(1) << std::setw(14) << (std::to_string(static_cast<int>(s.cpuTemperatureCelsius)) + " °C")
+                  << std::fixed << std::setprecision(1) << std::setw(14) << formatOptional(s.cpuTemperatureCelsius, 1, " °C")
                   << std::fixed << std::setprecision(0) << std::setw(16) << s.ramUsageMb
                   << std::fixed << std::setprecision(1) << std::setw(12) << s.ramUsagePercentage
                   << std::endl;

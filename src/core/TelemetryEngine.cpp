@@ -55,7 +55,9 @@ void TelemetryEngine::samplingLoop(std::stop_token stopToken) {
         TelemetrySample sample;
         sample.timestamp = std::chrono::system_clock::now();
         sample.cpuUsagePercentage = cpuUsage.value_or(0.0);
-        sample.cpuTemperatureCelsius = cpuTemp.value_or(0.0);
+        sample.cpuTemperatureCelsius = cpuTemp;  // std::optional<double> can hold nullopt if temperature is unavailable
+        sample.ramUsageMb = 0.0;
+        sample.ramUsagePercentage = 0.0;
 
         if (memMetrics) {
             sample.ramUsageMb = static_cast<double>(memMetrics->usedRamKb) / 1024.0;

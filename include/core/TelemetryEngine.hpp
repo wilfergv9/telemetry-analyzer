@@ -7,11 +7,12 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <optional>
 
 struct TelemetrySample {
     std::chrono::system_clock::time_point timestamp;
     double cpuUsagePercentage{0.0};
-    double cpuTemperatureCelsius{0.0};
+    std::optional<double> cpuTemperatureCelsius{0.0};
     double ramUsageMb{0.0};
     double ramUsagePercentage{0.0};
 };
