@@ -422,8 +422,9 @@ Si no aporta, se habrá perdido poco y aprendido bastante.
 - [x] Repositorio creado
 - [x] Collector de CPU, RAM y temperatura con soporte de "N/D" para la temperatura
 - [x] Uso de CPU opcional ("N/D" en la primera muestra)
-- [ ] Definir el esquema de datos de una sesión
-- [ ] Escritor de sesión en CSV, de forma incremental
+- [ ] Definir el esquema de datos de una sesión (columnas del CSV definidas; faltan los metadatos)
+- [x] Clase `CsvSessionWriter` (escribe un CSV con cabecera; `N/D` como campo vacío)
+- [ ] Conectar el motor con el escritor para guardar las muestras durante la sesión
 - [ ] Collector por proceso (`/proc/PID/status`)
 - [ ] Decidir base de datos, frecuencia de muestreo y formato de exportación
 - [ ] Definir las primeras reglas de diagnóstico
