@@ -110,7 +110,7 @@ std::optional<double> CPUMonitor::getCpuUsagePercentage() {
     previousSnapshot_ = currentSnapshot;
 
     if (deltaTotal == 0) {
-        return 0.0;
+        return std::nullopt;
     }
 
     return (static_cast<double>(deltaActive) / static_cast<double>(deltaTotal)) * 100.0;
