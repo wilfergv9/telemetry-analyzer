@@ -15,6 +15,7 @@ add_executable(telemetry_engine
     src/core/CPUMonitor.cpp
     src/core/MemoryMonitor.cpp
     src/core/TelemetryEngine.cpp
+    src/core/CsvSessionWriter.cpp
 )
 
 # Header directory (public/internal)
