@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include "core/TelemetryEngine.hpp"
+#include "core/TelemetrySample.hpp"
 
 class CsvSessionWriter {
 public:

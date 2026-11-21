@@ -2,20 +2,12 @@
 
 #include "core/CPUMonitor.hpp"
 #include "core/MemoryMonitor.hpp"
+#include "core/TelemetrySample.hpp"
 
 #include <chrono>
 #include <mutex>
 #include <thread>
 #include <vector>
-#include <optional>
-
-struct TelemetrySample {
-    std::chrono::system_clock::time_point timestamp;
-    std::optional<double> cpuUsagePercentage;
-    std::optional<double> cpuTemperatureCelsius;
-    std::optional<double> ramUsageMb;
-    std::optional<double> ramUsagePercentage;
-};
 
 class TelemetryEngine {
 public:
