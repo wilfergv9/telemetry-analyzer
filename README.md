@@ -12,9 +12,9 @@ The long-term goal is to turn every play session into a record you can explore, 
 ## What works today
 
 - A background sampling engine (C++20, `std::jthread`) that collects samples at a fixed interval.
-- **CPU usage**, computed from `/proc/stat` (reported as N/D when it cannot be computed, such as in the first sample).
+- **CPU usage**, computed from `/proc/stat` (reported as `N/D` when it cannot be computed, such as in the first sample).
 - **CPU package temperature**, discovered dynamically through `hwmon` (the `coretemp` sensor, Intel only for now). If the sensor is missing, the engine keeps running and reports the temperature as `N/D`.
-- **RAM usage** (and swap, parsed but not stored yet), read from `/proc/meminfo` (reported as N/D if unavailable).
+- **RAM usage** (and swap, parsed but not stored yet), read from `/proc/meminfo` (reported as `N/D` if unavailable).
 - A demo `main` that samples for a few seconds and prints a table.
 
 Example output (values will differ on your machine):
@@ -22,7 +22,7 @@ Example output (values will differ on your machine):
 ```text
 Index   CPU (%)       CPU Temp      RAM Used (MB)   RAM (%)
 ----------------------------------------------------------------
-1       0.0           45.0 °C       10214           43.1
+1       N/D           45.0 °C       10214           43.1
 2       7.0           45.0 °C       10217           43.1
 3       3.6           45.0 °C       10218           43.1
 ```
@@ -54,7 +54,7 @@ cmake --build build
 
 The design notes, scope and ideas live in [IDEAS.md](IDEAS.md). Short term:
 
-- Treat CPU usage as an optional value as well (`N/D` when it cannot be computed).
+- Write sessions to disk incrementally (CSV first).
 - Collect per-process data (`/proc/<PID>/status`).
 - Add GPU metrics.
 - Later: frame time capture, post-session report, session comparison.
